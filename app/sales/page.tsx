@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Plus, Minus, Search, ShoppingCart, X } from "lucide-react";
+import { Plus, Minus, Search, ShoppingCart, X, Calendar as CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 import { CartItem, Category, Extra, PaymentType, CafeItem } from "@/types";
 
@@ -22,6 +22,7 @@ export default function SalesEntry() {
   const [search, setSearch] = useState("");
   const [cart, setCart] = useState<CartItem[]>([]);
   const [paymentType, setPaymentType] = useState<PaymentType>("Cash");
+  const [saleDate, setSaleDate] = useState<string>(new Date().toISOString().split('T')[0]);
   const [isMobileCartOpen, setIsMobileCartOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   
@@ -106,8 +107,13 @@ export default function SalesEntry() {
   const handleCompleteOrder = () => {
     if (cart.length === 0) return;
     
+    // Preserve current time but use selected date
+    const now = new Date();
+    const timePart = now.toISOString().split('T')[1];
+    const timestamp = `${saleDate}T${timePart}`;
+    
     addSale({
-      timestamp: new Date().toISOString(),
+      timestamp,
       items: cart,
       totalAmount: totals.grandTotal,
       totalKitchenCost: totals.kitchenTotal,
@@ -269,8 +275,17 @@ export default function SalesEntry() {
         {/* RIGHT PANEL: CART */}
         <div className="col-span-1 lg:col-span-4 flex flex-col gap-6 lg:max-h-[calc(100vh-140px)] overflow-hidden lg:sticky lg:top-0">
           <Card className="hidden md:flex flex-1 flex-col shadow-sm border-border bg-card w-full">
-            <CardHeader className="border-b border-border bg-muted/30 pb-4">
+            <CardHeader className="border-b border-border bg-muted/30 pb-4 flex flex-row items-center justify-between">
               <CardTitle>Current Order</CardTitle>
+              <div className="flex items-center gap-2 bg-background border border-border rounded-md px-2 py-1">
+                <CalendarIcon className="h-4 w-4 text-muted-foreground" />
+                <Input 
+                  type="date" 
+                  value={saleDate}
+                  onChange={(e) => setSaleDate(e.target.value)}
+                  className="border-0 shadow-none focus-visible:ring-0 h-6 p-0 px-1 w-[120px] bg-transparent text-sm"
+                />
+              </div>
             </CardHeader>
             <CardContent className="p-0 flex-1 flex flex-col min-h-[300px]">
               <CartUI />
@@ -310,7 +325,18 @@ export default function SalesEntry() {
             </div>
             
             <div className="flex items-center justify-between px-6 pb-4 border-b border-border">
-              <h2 className="text-xl font-bold tracking-tight">Current Order</h2>
+              <div className="flex flex-col gap-1">
+                <h2 className="text-xl font-bold tracking-tight">Current Order</h2>
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <CalendarIcon className="h-4 w-4" />
+                  <Input 
+                    type="date" 
+                    value={saleDate}
+                    onChange={(e) => setSaleDate(e.target.value)}
+                    className="border-0 shadow-none focus-visible:ring-0 h-6 p-0 px-1 w-[120px] bg-transparent text-sm"
+                  />
+                </div>
+              </div>
               <Button variant="ghost" size="icon" onClick={() => setIsMobileCartOpen(false)} className="rounded-full bg-muted/50 h-10 w-10">
                  <X className="h-5 w-5" />
               </Button>
