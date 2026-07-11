@@ -5,6 +5,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { Sidebar } from "@/components/Sidebar";
 import Header from "@/components/Header";
 import ClientOnly from "@/components/ClientOnly";
+import PWAInstall from "@/components/PWAInstall";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -15,6 +16,7 @@ const poppins = Poppins({
 export const metadata: Metadata = {
   title: "Wild Gaming Cafe Management",
   description: "Official internal management system for Wild Gaming Cafe",
+  manifest: "/manifest.json",
   icons: {
     icon: "/logo.png",
     apple: "/logo.png",
@@ -50,6 +52,7 @@ export default function RootLayout({
             </div>
           </div>
         </ThemeProvider>
+        <PWAInstall />
       </body>
     </html>
   );
