@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { CafeItem, Sale, Settings, KitchenSettlement, Extra } from '../types';
-import { initialItems, initialSettings, initialExtras } from '../data/initialData';
+import { initialItems, initialSettings, initialExtras, initialSales, initialSettlements } from '../data/initialData';
 
 interface AppState {
   items: CafeItem[];
@@ -36,11 +36,10 @@ export const useStore = create<AppState>()(
   persist(
     (set, get) => ({
       items: initialItems,
-      // Clear legacy sales during this update so the app doesn't crash on old schema
-      sales: [],
+      sales: initialSales,
       extras: initialExtras,
       settings: initialSettings,
-      settlements: [],
+      settlements: initialSettlements,
       
       addItem: (item) => set((state) => ({
         items: [...state.items, { ...item, id: crypto.randomUUID() }]
@@ -99,56 +98,11 @@ export const useStore = create<AppState>()(
     }),
     {
       name: 'cafe-dashboard-storage',
-      version: 5,
+      version: 6,
       migrate: (persistedState: any, version) => {
-        // If coming from v1 without extras, inject initialExtras
-        if (!persistedState.extras) {
-          persistedState.extras = initialExtras;
-        } else {
-          // Migrate old extras that had 'price' instead of 'cafePrice'
-          persistedState.extras = persistedState.extras.map((e: any) => {
-            if (e.price !== undefined && e.cafePrice === undefined) {
-              return { ...e, cafePrice: e.price, kitchenCost: 0 };
-            }
-            return e;
-          });
-        }
-        
-        // Deduplicate items
-        if (persistedState.items) {
-          const uniqueItems = new Map();
-          persistedState.items.forEach((item: any) => {
-            if (!uniqueItems.has(item.name)) {
-              uniqueItems.set(item.name, item);
-            }
-          });
-          persistedState.items = Array.from(uniqueItems.values());
-        }
-
-        // Migrate settlements to new schema
-        if (persistedState.settlements) {
-          persistedState.settlements = persistedState.settlements.map((s: any) => {
-            if (s.kitchenPayable === undefined) {
-              return {
-                ...s,
-                kitchenPayable: s.amountPaid,
-                remainingAmount: 0,
-                status: 'Paid',
-                paymentMethod: 'Cash',
-                notes: 'Migrated legacy settlement'
-              };
-            }
-            return s;
-          });
-        }
-
-        // If sales have the old schema (e.g. they have itemId directly on the sale instead of an items array)
-        if (persistedState.sales && persistedState.sales.length > 0) {
-          if (persistedState.sales[0].itemId !== undefined) {
-             persistedState.sales = []; // wipe legacy sales to prevent crash
-          }
-        }
-        return persistedState;
+        // Version 6 completely resets the local storage to use the newly baked initialData.ts
+        // This ensures the Vercel deployment instantly reflects the user's custom JSON data
+        return undefined as any;
       },
     }
   )
