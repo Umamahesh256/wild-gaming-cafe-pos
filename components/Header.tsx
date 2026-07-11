@@ -90,7 +90,7 @@ export default function Header() {
             
             <div className="flex flex-col items-center gap-3 pb-8 mt-4">
               <div className="relative h-16 w-40 overflow-hidden rounded-md">
-                <Image src="/logo.png" alt="Logo" fill className="object-contain" />
+                <img src="/logo.png" alt="Logo" className="w-full h-full object-contain" />
               </div>
               <span className="text-xs font-semibold tracking-wider text-muted-foreground uppercase text-center mt-1">
                 Internal Management

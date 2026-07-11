@@ -22,13 +22,10 @@ export function Sidebar() {
     <div className="hidden md:flex h-screen w-20 lg:w-72 flex-col border-r border-border bg-card py-6 transition-all duration-300 print:hidden">
       <div className="flex flex-col items-center justify-center gap-3 px-2 pb-8">
         <div className="relative h-12 w-12 lg:h-20 lg:w-48 overflow-hidden rounded-md flex-shrink-0">
-          <Image 
+          <img 
             src="/logo.png" 
             alt="Logo" 
-            fill
-            sizes="(max-width: 1024px) 48px, 192px"
-            className="object-contain"
-            priority
+            className="w-full h-full object-contain"
           />
         </div>
         <span className="hidden lg:block text-sm font-semibold tracking-wider text-muted-foreground uppercase text-center mt-1">
