@@ -4,6 +4,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Sidebar } from "@/components/Sidebar";
 import Header from "@/components/Header";
+import ClientOnly from "@/components/ClientOnly";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -42,7 +43,9 @@ export default function RootLayout({
             <div className="flex flex-1 flex-col overflow-hidden">
               <Header />
               <main className="flex-1 overflow-y-auto bg-muted/20">
-                {children}
+                <ClientOnly>
+                  {children}
+                </ClientOnly>
               </main>
             </div>
           </div>

@@ -40,7 +40,7 @@ export default function Header() {
       <header className="sticky top-0 z-30 w-full border-b bg-card/95 backdrop-blur">
         <div className="flex h-16 items-center justify-between px-4 md:px-6">
           <div className="flex items-center gap-3">
-            <button 
+            <button
               className="md:hidden p-2 -ml-2 text-muted-foreground hover:text-foreground"
               onClick={() => setIsMobileMenuOpen(true)}
             >
@@ -48,12 +48,12 @@ export default function Header() {
             </button>
             <h1 className="text-lg md:text-xl font-semibold tracking-tight truncate max-w-[150px] sm:max-w-none">{getPageTitle()}</h1>
           </div>
-          
+
           <div className="flex items-center gap-4 md:gap-6">
             <div className="hidden text-sm text-muted-foreground lg:block">
               Wild Gaming Cafe Management
             </div>
-            
+
             <div className="flex items-center gap-2 md:gap-3 text-right">
               <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary shrink-0">
                 <Clock className="h-4 w-4" />
@@ -75,22 +75,22 @@ export default function Header() {
       {isMobileMenuOpen && (
         <div className="fixed inset-0 z-50 md:hidden flex">
           {/* Overlay */}
-          <div 
-            className="fixed inset-0 bg-background/80 backdrop-blur-sm" 
+          <div
+            className="fixed inset-0 bg-background/80 backdrop-blur-sm"
             onClick={() => setIsMobileMenuOpen(false)}
           />
           {/* Drawer Content */}
           <div className="relative w-3/4 max-w-sm bg-card border-r border-border h-full flex flex-col p-6 animate-in slide-in-from-left">
-            <button 
+            <button
               className="absolute top-4 right-4 p-2 text-muted-foreground hover:text-foreground"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               <X className="h-6 w-6" />
             </button>
-            
+
             <div className="flex flex-col items-center gap-3 pb-8 mt-4">
               <div className="relative h-16 w-40 overflow-hidden rounded-md">
-                <img src="/logo.png" alt="Logo" className="w-full h-full object-contain" />
+                <Image src="/logo.png" alt="Logo" fill className="object-contain" />
               </div>
               <span className="text-xs font-semibold tracking-wider text-muted-foreground uppercase text-center mt-1">
                 Internal Management
