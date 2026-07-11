@@ -10,7 +10,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Plus, Minus, Search, ShoppingCart, X } from "lucide-react";
 import { format } from "date-fns";
 import { CartItem, Category, Extra, PaymentType, CafeItem } from "@/types";
-import { useToast } from "@/components/ui/use-toast"; // assuming this exists or I'll just use standard alerts/toasts? Actually standard alert is fine. We can use a simple state toast.
 
 const vegCategories: Category[] = ["Veg Starters", "Veg Fried Rice", "Veg Noodles", "Veg Combos"];
 const nonVegCategories: Category[] = ["Non Veg Starters", "Non Veg Fried Rice", "Non Veg Noodles", "Non Veg Combos"];
