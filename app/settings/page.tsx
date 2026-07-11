@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useTheme } from "next-themes";
-import { Moon, Sun, PlusCircle, Trash2, Edit2 } from "lucide-react";
+import { Moon, Sun, PlusCircle, Trash2, Edit2, Download, Upload } from "lucide-react";
 import { initialItems } from "@/data/initialData";
 
 export default function SettingsPage() {
@@ -65,6 +65,54 @@ export default function SettingsPage() {
 
     duplicateIds.forEach(id => deleteItem(id));
     alert(`Successfully removed ${duplicateIds.length} duplicate items!`);
+  };
+
+  const handleBackup = () => {
+    try {
+      const data = localStorage.getItem('cafe-dashboard-storage');
+      if (!data) return alert("No data found to backup!");
+      
+      const blob = new Blob([data], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `wild-cafe-backup-${new Date().toISOString().split('T')[0]}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      alert("Failed to create backup.");
+    }
+  };
+
+  const handleRestore = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!confirm("WARNING: This will completely replace your current data with the backup file. Are you sure you want to proceed?")) {
+      e.target.value = '';
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const content = event.target?.result as string;
+        // Basic validation that it's our JSON
+        const parsed = JSON.parse(content);
+        if (!parsed.state) throw new Error("Invalid backup file format");
+        
+        localStorage.setItem('cafe-dashboard-storage', content);
+        alert("Restore successful! The page will now reload to apply your data.");
+        window.location.reload();
+      } catch (err) {
+        alert("Failed to restore backup. Make sure you selected a valid Wild Cafe backup JSON file.");
+        console.error(err);
+      }
+      e.target.value = '';
+    };
+    reader.readAsText(file);
   };
 
   if (!mounted) return null;
@@ -204,12 +252,34 @@ export default function SettingsPage() {
               <CardDescription>Backup, restore, and fix your local data.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <Button onClick={handleAddMissingItems} className="w-full h-12 md:h-10 bg-green-600 hover:bg-green-700 text-white font-bold">
-                <PlusCircle className="mr-2 h-4 w-4" /> Add Missing Items / Combos
-              </Button>
-              <Button onClick={handleRemoveDuplicates} className="w-full h-12 md:h-10 bg-destructive hover:bg-destructive/90 text-destructive-foreground font-bold">
-                <Trash2 className="mr-2 h-4 w-4" /> Clean Duplicate Items
-              </Button>
+              <div className="flex gap-2">
+                <Button onClick={handleBackup} className="flex-1 h-12 md:h-10 bg-primary hover:bg-primary/90 text-primary-foreground font-bold">
+                  <Download className="mr-2 h-4 w-4" /> Backup Data
+                </Button>
+                <div className="relative flex-1">
+                  <Button className="w-full h-12 md:h-10 border border-primary text-primary hover:bg-primary hover:text-primary-foreground bg-transparent font-bold">
+                    <Upload className="mr-2 h-4 w-4" /> Restore Data
+                  </Button>
+                  <Input 
+                    type="file" 
+                    accept=".json"
+                    onChange={handleRestore}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                  />
+                </div>
+              </div>
+              
+              <div className="pt-4 border-t border-border mt-4">
+                <h4 className="text-sm font-semibold mb-3 text-muted-foreground">Advanced Tools</h4>
+                <div className="space-y-3">
+                  <Button onClick={handleAddMissingItems} variant="outline" className="w-full h-10 border-border hover:bg-muted">
+                    <PlusCircle className="mr-2 h-4 w-4" /> Add Missing Initial Items
+                  </Button>
+                  <Button onClick={handleRemoveDuplicates} variant="outline" className="w-full h-10 border-destructive text-destructive hover:bg-destructive/10">
+                    <Trash2 className="mr-2 h-4 w-4" /> Clean Duplicate Items
+                  </Button>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </div>
