@@ -140,16 +140,16 @@ export default function OrdersPage() {
 
         <Card className="shadow-sm border-border bg-card flex-1">
           <CardContent className="p-0 sm:p-6">
-            <div className="overflow-x-auto w-full">
-              <Table className="min-w-[800px]">
+            <div className="w-full overflow-hidden">
+              <Table className="w-full text-xs sm:text-sm">
                 <TableHeader className="bg-muted/30">
                   <TableRow className="border-border hover:bg-transparent">
-                    <TableHead className="pl-4 sm:pl-2">Order #</TableHead>
-                    <TableHead>Time</TableHead>
-                    <TableHead>Items</TableHead>
-                    <TableHead>Total</TableHead>
-                    <TableHead>Payment</TableHead>
-                    <TableHead className="text-right pr-4 sm:pr-2">Actions</TableHead>
+                    <TableHead className="px-1 sm:pl-2 w-[60px] sm:w-auto">Order</TableHead>
+                    <TableHead className="px-1">Time</TableHead>
+                    <TableHead className="px-1">Items</TableHead>
+                    <TableHead className="px-1">Total</TableHead>
+                    <TableHead className="hidden sm:table-cell px-1">Payment</TableHead>
+                    <TableHead className="text-right pr-2 sm:pr-4">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -158,26 +158,26 @@ export default function OrdersPage() {
                   ) : (
                     filteredSales.sort((a,b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()).map(sale => (
                       <TableRow key={sale.id} className="border-border hover:bg-muted/50 transition-colors">
-                        <TableCell className="font-mono text-xs text-muted-foreground pl-4 sm:pl-2">{sale.id.slice(0, 8).toUpperCase()}</TableCell>
-                        <TableCell className="text-sm font-medium whitespace-nowrap">{format(new Date(sale.timestamp), 'hh:mm a')}</TableCell>
-                        <TableCell className="max-w-[250px]">
+                        <TableCell className="font-mono text-[10px] sm:text-xs text-muted-foreground px-1 sm:pl-2">{sale.id.slice(0, 6).toUpperCase()}</TableCell>
+                        <TableCell className="font-medium whitespace-nowrap px-1">{format(new Date(sale.timestamp), 'hh:mm a')}</TableCell>
+                        <TableCell className="max-w-[120px] sm:max-w-[250px] px-1">
                           {sale.items.map((i, idx) => {
                             const name = items.find(it => it.id === i.itemId)?.name || 'Unknown';
-                            return <div key={idx} className="text-sm truncate">{i.quantity}x {name} {i.extras.length > 0 && <span className="text-xs text-muted-foreground italic">(+{i.extras.length} extras)</span>}</div>
+                            return <div key={idx} className="truncate">{i.quantity}x {name} {i.extras.length > 0 && <span className="text-[10px] text-muted-foreground italic">(+{i.extras.length})</span>}</div>
                           })}
                         </TableCell>
-                        <TableCell className="font-bold text-base text-primary">₹{sale.totalAmount}</TableCell>
-                        <TableCell className="font-medium text-sm">{sale.paymentType}</TableCell>
-                        <TableCell className="text-right pr-4 sm:pr-2">
-                          <div className="flex justify-end gap-1">
-                            <Button variant="ghost" size="icon" onClick={() => handlePrint(sale)} className="h-10 w-10 md:h-8 md:w-8 hover:bg-muted" title="Print Receipt">
-                              <Printer className="h-5 w-5 md:h-4 md:w-4 text-foreground" />
+                        <TableCell className="font-bold sm:text-base text-primary px-1">₹{sale.totalAmount}</TableCell>
+                        <TableCell className="hidden sm:table-cell font-medium px-1">{sale.paymentType}</TableCell>
+                        <TableCell className="text-right pr-2 sm:pr-4">
+                          <div className="flex justify-end gap-0 sm:gap-1">
+                            <Button variant="ghost" size="icon" onClick={() => handlePrint(sale)} className="h-8 w-8 md:h-8 md:w-8 hover:bg-muted" title="Print Receipt">
+                              <Printer className="h-4 w-4 md:h-4 md:w-4 text-foreground" />
                             </Button>
-                            <Button variant="ghost" size="icon" onClick={() => openEdit(sale)} className="h-10 w-10 md:h-8 md:w-8 hover:bg-muted" title="Edit Order">
-                              <Edit className="h-5 w-5 md:h-4 md:w-4 text-foreground" />
+                            <Button variant="ghost" size="icon" onClick={() => openEdit(sale)} className="h-8 w-8 md:h-8 md:w-8 hover:bg-muted" title="Edit Order">
+                              <Edit className="h-4 w-4 md:h-4 md:w-4 text-foreground" />
                             </Button>
-                            <Button variant="ghost" size="icon" onClick={() => handleDelete(sale)} className="h-10 w-10 md:h-8 md:w-8 text-destructive hover:bg-destructive/10" title="Delete Order">
-                              <Trash2 className="h-5 w-5 md:h-4 md:w-4" />
+                            <Button variant="ghost" size="icon" onClick={() => handleDelete(sale)} className="h-8 w-8 md:h-8 md:w-8 text-destructive hover:bg-destructive/10" title="Delete Order">
+                              <Trash2 className="h-4 w-4 md:h-4 md:w-4" />
                             </Button>
                           </div>
                         </TableCell>

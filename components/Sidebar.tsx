@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 export const navItems = [
   { name: "Dashboard", href: "/", icon: LayoutDashboard },
   { name: "Sales Entry", href: "/sales", icon: ShoppingBag },
-  { name: "Today's Orders", href: "/orders", icon: Receipt },
+  { name: "Orders", href: "/orders", icon: Receipt },
   { name: "Cafe Menu", href: "/menu", icon: Menu },
   { name: "Daily Report", href: "/reports", icon: BarChart3 },
   { name: "Settings", href: "/settings", icon: Settings },
