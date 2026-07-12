@@ -152,9 +152,72 @@ export default function SettingsPage() {
               </form>
             </CardContent>
           </Card>
+        </div>
 
-          <Card className="md:col-span-2 border-border shadow-sm bg-card">
+        <div className="space-y-6">
+          <Card className="border-border shadow-sm bg-card">
             <CardHeader>
+              <CardTitle>Appearance</CardTitle>
+              <CardDescription>Toggle between light and dark mode.</CardDescription>
+            </CardHeader>
+            <CardContent className="grid grid-cols-2 gap-4">
+              <Button 
+                variant={resolvedTheme === 'light' ? 'default' : 'outline'} 
+                onClick={() => setTheme('light')}
+                className="w-full h-12 md:h-10"
+              >
+                <Sun className="mr-2 h-4 w-4" /> Light
+              </Button>
+              <Button 
+                variant={resolvedTheme === 'dark' ? 'default' : 'outline'} 
+                onClick={() => setTheme('dark')}
+                className="w-full h-12 md:h-10"
+              >
+                <Moon className="mr-2 h-4 w-4" /> Dark
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card className="border-border shadow-sm bg-card">
+            <CardHeader>
+              <CardTitle>Data Management</CardTitle>
+              <CardDescription>Backup, restore, and fix your local data.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex flex-col sm:flex-row gap-2">
+                <Button onClick={handleBackup} className="flex-1 h-12 md:h-10 bg-primary hover:bg-primary/90 text-primary-foreground font-bold">
+                  <Download className="mr-2 h-4 w-4" /> Backup Data
+                </Button>
+                <div className="relative flex-1">
+                  <Button className="w-full h-12 md:h-10 border border-primary text-primary hover:bg-primary hover:text-primary-foreground bg-transparent font-bold">
+                    <Upload className="mr-2 h-4 w-4" /> Restore Data
+                  </Button>
+                  <Input 
+                    type="file" 
+                    accept=".json"
+                    onChange={handleRestore}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                  />
+                </div>
+              </div>
+              
+              <div className="pt-4 border-t border-border mt-4">
+                <h4 className="text-sm font-semibold mb-3 text-muted-foreground">Advanced Tools</h4>
+                <div className="space-y-3">
+                  <Button onClick={handleAddMissingItems} variant="outline" className="w-full h-12 md:h-10 border-border hover:bg-muted">
+                    <PlusCircle className="mr-2 h-4 w-4" /> Add Missing Initial Items
+                  </Button>
+                  <Button onClick={handleRemoveDuplicates} variant="outline" className="w-full h-12 md:h-10 border-destructive text-destructive hover:bg-destructive/10">
+                    <Trash2 className="mr-2 h-4 w-4" /> Clean Duplicate Items
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        <Card className="md:col-span-2 border-border shadow-sm bg-card">
+          <CardHeader>
               <CardTitle>Extras Management</CardTitle>
               <CardDescription>Configure reusable addons like Extra Cheese.</CardDescription>
             </CardHeader>
@@ -219,70 +282,7 @@ export default function SettingsPage() {
                 </div>
               </div>
             </CardContent>
-          </Card>
-        </div>
-
-        <div className="space-y-6">
-          <Card className="border-border shadow-sm bg-card">
-            <CardHeader>
-              <CardTitle>Appearance</CardTitle>
-              <CardDescription>Toggle between light and dark mode.</CardDescription>
-            </CardHeader>
-            <CardContent className="grid grid-cols-2 gap-4">
-              <Button 
-                variant={resolvedTheme === 'light' ? 'default' : 'outline'} 
-                onClick={() => setTheme('light')}
-                className="w-full h-12 md:h-10"
-              >
-                <Sun className="mr-2 h-4 w-4" /> Light
-              </Button>
-              <Button 
-                variant={resolvedTheme === 'dark' ? 'default' : 'outline'} 
-                onClick={() => setTheme('dark')}
-                className="w-full h-12 md:h-10"
-              >
-                <Moon className="mr-2 h-4 w-4" /> Dark
-              </Button>
-            </CardContent>
-          </Card>
-
-          <Card className="border-border shadow-sm bg-card">
-            <CardHeader>
-              <CardTitle>Data Management</CardTitle>
-              <CardDescription>Backup, restore, and fix your local data.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex gap-2">
-                <Button onClick={handleBackup} className="flex-1 h-12 md:h-10 bg-primary hover:bg-primary/90 text-primary-foreground font-bold">
-                  <Download className="mr-2 h-4 w-4" /> Backup Data
-                </Button>
-                <div className="relative flex-1">
-                  <Button className="w-full h-12 md:h-10 border border-primary text-primary hover:bg-primary hover:text-primary-foreground bg-transparent font-bold">
-                    <Upload className="mr-2 h-4 w-4" /> Restore Data
-                  </Button>
-                  <Input 
-                    type="file" 
-                    accept=".json"
-                    onChange={handleRestore}
-                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                  />
-                </div>
-              </div>
-              
-              <div className="pt-4 border-t border-border mt-4">
-                <h4 className="text-sm font-semibold mb-3 text-muted-foreground">Advanced Tools</h4>
-                <div className="space-y-3">
-                  <Button onClick={handleAddMissingItems} variant="outline" className="w-full h-10 border-border hover:bg-muted">
-                    <PlusCircle className="mr-2 h-4 w-4" /> Add Missing Initial Items
-                  </Button>
-                  <Button onClick={handleRemoveDuplicates} variant="outline" className="w-full h-10 border-destructive text-destructive hover:bg-destructive/10">
-                    <Trash2 className="mr-2 h-4 w-4" /> Clean Duplicate Items
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+        </Card>
       </div>
 
       <Dialog open={!!editingExtra} onOpenChange={(open) => !open && setEditingExtra(null)}>
