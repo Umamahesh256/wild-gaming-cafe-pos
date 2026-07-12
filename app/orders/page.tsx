@@ -20,7 +20,14 @@ export default function OrdersPage() {
   
   useEffect(() => setMounted(true), []);
 
-  const filteredSales = sales.filter((sale) => format(new Date(sale.timestamp), 'yyyy-MM-dd') === dateFilter);
+  const filteredSales = (sales || []).filter((sale) => {
+    if (!sale?.timestamp) return false;
+    try {
+      return format(new Date(sale.timestamp), 'yyyy-MM-dd') === dateFilter;
+    } catch {
+      return false;
+    }
+  });
   
   // Undo Logic State
   const [deletedQueue, setDeletedQueue] = useState<{sale: Sale, timer: NodeJS.Timeout}[]>([]);
@@ -60,7 +67,7 @@ export default function OrdersPage() {
 
   const openEdit = (sale: Sale) => {
     setEditSale(sale);
-    setEditCart([...sale.items]);
+    setEditCart([...(sale.items || [])]);
     setEditPayment(sale.paymentType);
   };
 
@@ -84,8 +91,8 @@ export default function OrdersPage() {
 
     editCart.forEach(item => {
       const itemBase = item.cafePrice * item.quantity;
-      const extraCost = item.extras.reduce((acc, curr) => acc + curr.cafePrice, 0) * item.quantity;
-      const extraKitchen = item.extras.reduce((acc, curr) => acc + curr.kitchenCost, 0) * item.quantity;
+      const extraCost = (item.extras || []).reduce((acc, curr) => acc + (curr.cafePrice || 0), 0) * item.quantity;
+      const extraKitchen = (item.extras || []).reduce((acc, curr) => acc + (curr.kitchenCost || 0), 0) * item.quantity;
       
       itemsTotal += itemBase;
       extrasTotal += extraCost;
@@ -161,9 +168,9 @@ export default function OrdersPage() {
                         <TableCell className="font-mono text-[10px] sm:text-xs text-muted-foreground px-1 sm:pl-2">{sale.id.slice(0, 6).toUpperCase()}</TableCell>
                         <TableCell className="font-medium whitespace-nowrap px-1">{format(new Date(sale.timestamp), 'hh:mm a')}</TableCell>
                         <TableCell className="max-w-[120px] sm:max-w-[250px] px-1">
-                          {sale.items.map((i, idx) => {
+                          {(sale.items || []).map((i, idx) => {
                             const name = items.find(it => it.id === i.itemId)?.name || 'Unknown';
-                            return <div key={idx} className="truncate">{i.quantity}x {name} {i.extras.length > 0 && <span className="text-[10px] text-muted-foreground italic">(+{i.extras.length})</span>}</div>
+                            return <div key={idx} className="truncate">{i.quantity}x {name} {(i.extras || []).length > 0 && <span className="text-[10px] text-muted-foreground italic">(+{(i.extras || []).length})</span>}</div>
                           })}
                         </TableCell>
                         <TableCell className="font-bold sm:text-base text-primary px-1">₹{sale.totalAmount}</TableCell>
@@ -199,7 +206,7 @@ export default function OrdersPage() {
             <div className="flex flex-col gap-4 py-4 max-h-[60vh] overflow-y-auto pr-2">
               {editCart.map((cartItem, index) => {
                 const itemData = items.find(i => i.id === cartItem.itemId);
-                const itemExtrasCost = cartItem.extras.reduce((acc, curr) => acc + curr.cafePrice, 0);
+                const itemExtrasCost = (cartItem.extras || []).reduce((acc, curr) => acc + (curr.cafePrice || 0), 0);
                 return (
                   <div key={cartItem.id} className="flex flex-col gap-2 p-3 bg-background rounded-md border border-border">
                     <div className="flex justify-between items-start">
@@ -207,9 +214,9 @@ export default function OrdersPage() {
                       <div className="font-bold text-primary">₹{(cartItem.cafePrice + itemExtrasCost) * cartItem.quantity}</div>
                     </div>
                     
-                    {cartItem.extras.length > 0 && (
+                    {(cartItem.extras || []).length > 0 && (
                       <div className="text-xs text-muted-foreground">
-                        Extras: {cartItem.extras.map(e => e.name).join(', ')}
+                        Extras: {(cartItem.extras || []).map(e => e.name).join(', ')}
                       </div>
                     )}
 
