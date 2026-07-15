@@ -20,7 +20,7 @@ export default function DailyReport() {
   const [dateFilter, setDateFilter] = useState("Today");
 
   // Filter sales
-  const filteredSales = sales.filter(sale => {
+  const filteredSales = (sales || []).filter(sale => {
     const d = new Date(sale.timestamp);
     if (dateFilter === "Today") return isToday(d);
     if (dateFilter === "Yesterday") return isYesterday(d);
@@ -36,12 +36,12 @@ export default function DailyReport() {
 
   // Item Wise Aggregation
   const itemWise = filteredSales.reduce((acc, curr) => {
-    curr.items.forEach(cartItem => {
+    (curr.items || []).forEach(cartItem => {
       if (!acc[cartItem.itemId]) {
         acc[cartItem.itemId] = { quantity: 0, revenue: 0, kitchenCost: 0, profit: 0 };
       }
-      const extrasCost = cartItem.extras.reduce((sum, e) => sum + e.cafePrice, 0);
-      const extrasKitchen = cartItem.extras.reduce((sum, e) => sum + e.kitchenCost, 0);
+      const extrasCost = (cartItem.extras || []).reduce((sum, e) => sum + (e.cafePrice || 0), 0);
+      const extrasKitchen = (cartItem.extras || []).reduce((sum, e) => sum + (e.kitchenCost || 0), 0);
       const revenue = (cartItem.cafePrice + extrasCost) * cartItem.quantity;
       const kCost = (cartItem.kitchenCost + extrasKitchen) * cartItem.quantity;
       
@@ -61,14 +61,14 @@ export default function DailyReport() {
 
   // Category Wise Aggregation
   const categoryWise = filteredSales.reduce((acc, curr) => {
-    curr.items.forEach(cartItem => {
+    (curr.items || []).forEach(cartItem => {
       const item = items.find(i => i.id === cartItem.itemId);
       const cat = item ? item.category : "Unknown";
       if (!acc[cat]) {
         acc[cat] = { quantity: 0, revenue: 0, profit: 0 };
       }
-      const extrasCost = cartItem.extras.reduce((sum, e) => sum + e.cafePrice, 0);
-      const extrasKitchen = cartItem.extras.reduce((sum, e) => sum + e.kitchenCost, 0);
+      const extrasCost = (cartItem.extras || []).reduce((sum, e) => sum + (e.cafePrice || 0), 0);
+      const extrasKitchen = (cartItem.extras || []).reduce((sum, e) => sum + (e.kitchenCost || 0), 0);
       const revenue = (cartItem.cafePrice + extrasCost) * cartItem.quantity;
       const profit = revenue - ((cartItem.kitchenCost + extrasKitchen) * cartItem.quantity);
 
@@ -86,8 +86,8 @@ export default function DailyReport() {
   }, { Cash: 0, UPI: 0, Card: 0 } as Record<string, number>);
 
   // Settlement Logic
-  const totalKitchenCostEver = sales.reduce((acc, curr) => acc + curr.totalKitchenCost, 0);
-  const totalSettledEver = settlements.reduce((acc, curr) => acc + curr.amountPaid, 0);
+  const totalKitchenCostEver = (sales || []).reduce((acc, curr) => acc + (curr.totalKitchenCost || 0), 0);
+  const totalSettledEver = (settlements || []).reduce((acc, curr) => acc + (curr.amountPaid || 0), 0);
   const pendingSettlement = totalKitchenCostEver - totalSettledEver;
   
   const [partialAmount, setPartialAmount] = useState<string>("");
