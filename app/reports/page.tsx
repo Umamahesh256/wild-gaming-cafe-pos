@@ -277,8 +277,8 @@ export default function DailyReport() {
         <h2 className="text-2xl md:text-3xl font-bold tracking-tight">Daily CRM Report</h2>
         <div className="flex flex-wrap items-center gap-2 no-print w-full sm:w-auto">
           <Select value={dateFilter.match(/^\d{4}-\d{2}$/) ? "Custom" : dateFilter} onValueChange={(v) => {
-            if (v !== "Custom") setDateFilter(v);
-            else setDateFilter("Custom");
+            if (v && v !== "Custom") setDateFilter(v as string);
+            else if (v === "Custom") setDateFilter("Custom");
           }}>
             <SelectTrigger className="w-full sm:w-[150px] h-12 md:h-10 border-border bg-card shadow-sm font-semibold"><SelectValue /></SelectTrigger>
             <SelectContent>
