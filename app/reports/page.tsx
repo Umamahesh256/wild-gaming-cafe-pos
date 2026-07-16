@@ -24,7 +24,15 @@ export default function DailyReport() {
     const d = new Date(sale.timestamp);
     if (dateFilter === "Today") return isToday(d);
     if (dateFilter === "Yesterday") return isYesterday(d);
-    return true;
+    if (dateFilter === "This Month") {
+      const now = new Date();
+      return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+    }
+    if (dateFilter.match(/^\d{4}-\d{2}$/)) {
+       const [year, month] = dateFilter.split("-");
+       return d.getFullYear() === parseInt(year) && d.getMonth() === parseInt(month) - 1;
+    }
+    return true; // All Time or "Custom" before picking
   });
 
   // Calculate Summaries
@@ -95,6 +103,19 @@ export default function DailyReport() {
   const [settlementNotes, setSettlementNotes] = useState<string>("");
 
   const [confirmDialog, setConfirmDialog] = useState<{ isOpen: boolean; type: 'Partial' | 'Full' | 'Undo' | 'Delete' | null; id?: string }>({ isOpen: false, type: null });
+  const [showPDFDialog, setShowPDFDialog] = useState(false);
+
+  const getDisplayDateStr = (filter: string) => {
+    if (filter === "Today") return format(new Date(), 'dd MMM yyyy');
+    if (filter === "Yesterday") return format(new Date(Date.now() - 86400000), 'dd MMM yyyy');
+    if (filter === "This Month") return format(new Date(), 'MMMM yyyy');
+    if (filter === "All Time") return "All Time";
+    if (filter.match(/^\d{4}-\d{2}$/)) {
+       const [year, month] = filter.split('-');
+       return format(new Date(parseInt(year), parseInt(month) - 1), 'MMMM yyyy');
+    }
+    return "Selected Date";
+  }
 
   const handleConfirmAction = () => {
     if (confirmDialog.type === 'Full') {
@@ -144,7 +165,7 @@ export default function DailyReport() {
 
   const generatePDF = () => {
     const doc = new jsPDF('p', 'mm', 'a4');
-    const dateStr = dateFilter === 'Today' ? format(new Date(), 'dd MMM yyyy') : (dateFilter === 'Yesterday' ? format(new Date(Date.now() - 86400000), 'dd MMM yyyy') : 'All Time');
+    const dateStr = getDisplayDateStr(dateFilter);
     
     // Header
     doc.setFontSize(22);
@@ -255,15 +276,30 @@ export default function DailyReport() {
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <h2 className="text-2xl md:text-3xl font-bold tracking-tight">Daily CRM Report</h2>
         <div className="flex flex-wrap items-center gap-2 no-print w-full sm:w-auto">
-          <Select value={dateFilter} onValueChange={(v) => v && setDateFilter(v)}>
+          <Select value={dateFilter.match(/^\d{4}-\d{2}$/) ? "Custom" : dateFilter} onValueChange={(v) => {
+            if (v !== "Custom") setDateFilter(v);
+            else setDateFilter("Custom");
+          }}>
             <SelectTrigger className="w-full sm:w-[150px] h-12 md:h-10 border-border bg-card shadow-sm font-semibold"><SelectValue /></SelectTrigger>
             <SelectContent>
               <SelectItem value="Today">Today</SelectItem>
               <SelectItem value="Yesterday">Yesterday</SelectItem>
+              <SelectItem value="This Month">This Month</SelectItem>
+              <SelectItem value="Custom">Custom Month</SelectItem>
               <SelectItem value="All Time">All Time</SelectItem>
             </SelectContent>
           </Select>
-          <Button variant="outline" className="flex-1 sm:flex-none h-12 md:h-10 border-border hover:bg-muted font-bold" onClick={generatePDF}>
+          
+          {(dateFilter.match(/^\d{4}-\d{2}$/) || dateFilter === "Custom") && (
+             <Input 
+                type="month" 
+                value={dateFilter === "Custom" ? "" : dateFilter}
+                onChange={e => setDateFilter(e.target.value)} 
+                className="w-full sm:w-auto h-12 md:h-10 font-semibold"
+             />
+          )}
+
+          <Button variant="outline" className="flex-1 sm:flex-none h-12 md:h-10 border-border hover:bg-muted font-bold" onClick={() => setShowPDFDialog(true)}>
             <FileText className="mr-2 h-5 w-5 md:h-4 md:w-4" /> PDF
           </Button>
           <Button variant="outline" className="flex-1 sm:flex-none h-12 md:h-10 border-border hover:bg-muted font-bold" onClick={downloadCSV}>
@@ -493,6 +529,23 @@ export default function DailyReport() {
           <DialogFooter className="flex-col sm:flex-row gap-2">
             <Button variant="outline" className="w-full sm:w-auto h-12 md:h-10 border-border" onClick={() => setConfirmDialog({ isOpen: false, type: null })}>Cancel</Button>
             <Button variant="default" className="w-full sm:w-auto h-12 md:h-10 font-bold" onClick={handleConfirmAction}>Confirm</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showPDFDialog} onOpenChange={setShowPDFDialog}>
+        <DialogContent className="w-[90vw] max-w-sm rounded-xl">
+          <DialogHeader>
+            <DialogTitle>Download PDF Report</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <p className="text-muted-foreground text-sm">
+              Are you sure you want to download the daily report for <strong>{getDisplayDateStr(dateFilter)}</strong>?
+            </p>
+          </div>
+          <DialogFooter className="flex-col sm:flex-row gap-2">
+            <Button variant="outline" onClick={() => setShowPDFDialog(false)}>Cancel</Button>
+            <Button onClick={() => { setShowPDFDialog(false); generatePDF(); }} className="bg-primary text-primary-foreground font-bold">Download Report</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
